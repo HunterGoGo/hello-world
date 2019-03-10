@@ -8,13 +8,17 @@
 	th, td { border:1px solid gray; }
 </style>
 <script type="text/javascript">
-	function add_row() {
-		var my_tbody = document.getElementById("my-tbody");
+	function add_row(tbody) {
+		if (tbody != "my-tbody") {
+			tbody = "my-tbody-" + tbody;
+		}
+		// console.log("tbody : " + tbody);
+		var my_tbody = document.getElementById(tbody);
 		var getRow = my_tbody.getElementsByTagName("tr");
 		var val = my_tbody.rows.length;
 		var str;
 		if (val == 0) {
-			str = 1;	
+			str = 1;
 		} else {
 			str = getRow[val-1].childNodes[0].firstChild.data;
 			str++;
@@ -29,14 +33,23 @@
 	    var cell5 = row.insertCell(4);
 	    cell1.innerHTML = str;
 	    cell2.innerHTML = new Date().toUTCString();
-	    cell3.innerHTML = "<input type=\"text\" name=\"sub" + str + "\" id=\"sub" + str + "\" onchange=\"check_value(this)\"/>";
-	    cell4.innerHTML = "<input type=\"text\" name=\"add\" id=\"add\"/>";
-	    cell5.innerHTML = "<button onclick=\"delete_row(this)\">삭제</button>";
+	    if (tbody == "my-tbody") {
+	    	cell3.innerHTML = "<input type=\"text\" name=\"sub" + str + "\" id=\"sub" + str + "\" onchange=\"check_value(this)\"/>";
+	    } else {
+	    	cell3.innerHTML = "";
+	    }
+	    cell4.innerHTML = "<input type=\"text\" name=\"add" + str + "\" id=\"add\"" + str + "/>";
+	    cell5.innerHTML = "<button onclick=\"delete_row(this,'','" + tbody + "')\" name=\"btn" + str + "\" id=\"btn" + str + "\">삭제</button>";
 	}
 	
-	function delete_row(num) {
-		var idx = num.parentElement.parentElement.rowIndex;
-		var my_tbody = document.getElementById("my-tbody");
+	function delete_row(obj, id, tbody) {
+		if (id != "") {
+			var element = document.getElementById(id);
+			element.parentNode.removeChild(element);
+		}
+		var idx = obj.parentElement.parentElement.rowIndex;
+		var my_tbody = document.getElementById(tbody);
+		
 	    if (my_tbody.rows.length < 1) return;
 	    // my_tbody.deleteRow(0); // 상단부터 삭제
 	    // my_tbody.deleteRow(my_tbody.rows.length-1); // 하단부터 삭제
@@ -46,21 +59,28 @@
 	function check_value(obj) {
 		var id = obj.getAttribute("id");
 		var value = document.getElementById(id).value;
+		var id_value = document.getElementById(id).getAttribute("id");
 		if (value.length > 0) {
+			var id_value_num = id_value.substr(id_value.length - 1);
+			var id_sub_value =  document.getElementById("sub" + id_value_num).value;
+			document.getElementById("btn" + id_value_num).setAttribute("onclick", "delete_row(this,'" + id_sub_value +"','my-tbody')");
+
 			add_tbl(obj);
+			alert("전문Layout (" + value + ") 를 작성하세요.");
 		} else {
 			var sub = document.getElementById("sub");
 			var body = document.getElementById("my-tbody");
-			console.log("sub.childNodes.length : " + sub.childNodes.length);
-			console.log("body.childNodes.length : " + body.childNodes.length);
 			for (var i = 1; i < sub.childNodes.length; i++) {
-				for (var j = 0; j < body.childNodes.length - 1; j++) {
-					sub_id = sub.childNodes[i].id;
-					tbody_value = document.getElementById("sub" + (j + 1)).value;
-	            	if (sub_id != tbody_value) {
-	            		console.log("sub_id : " + sub_id);
-	            		break;
-	            	}
+				// console.log("sub.childNodes[" + i + "].id : " + sub.childNodes[i].id);
+				for (var j = 1; j < body.childNodes.length; j++) {
+					if (document.getElementById("sub" + j).value != "") {
+						if (sub.childNodes[i].id != document.getElementById("sub" + j).value) {
+							// console.log("sub.childNodes[" + i + "].id : " + sub.childNodes[i].id);
+							console.log("sub" + j + " : " + document.getElementById("sub" + j).value);
+							var del_id = document.getElementById("sub" + j);
+							del_id.innerHTML = "";
+						}
+					}
 				}
 			}
 		}
@@ -73,18 +93,20 @@
 		var selected_val = tbl1_select.options[tbl1_select.selectedIndex].value;
 		var table = document.getElementById("sub");
 		table.innerHTML += "<div id=\"" + id_value +"\">\n" +
+						   "	<input type=\"hidden\" name=\"" + id_value + "_input1\" id=\"" + id_value + "_input1\" value=\"" + id_value + "\"/>\n" +
+						   "	<input type=\"hidden\" name=\"" + id_value + "_input2\" id=\"" + id_value + "_input2\" value=\"" + selected_val + "\"/>\n" +
 						   "	<br/>\n" +
 						   "	<h3>전문 Layout (" + id_value + ")</h3>" +
-						   "	<button onclick=\"add_row()\">행 추가하기</button>\n" +
+						   "	<button onclick=\"add_row('" + id_value + "')\">행 추가하기</button>\n" +
 						   "	<p/>\n" +
 						   "	<table>\n" +
 						   "		<tr>\n" +
 						   "			<td>1.입력</td>\n" +
-						   "			<td>" + id_value + "<input type=\"hidden\" name=\"" + id_value +"_input1\" id=\"" + id_value + "_input1\" value=\"" + id_value + "\"/></td>\n" +
+						   "			<td id=\"" + id_value + "_td1\">" + id_value + "</td>\n" +
 						   "		</tr>\n" +
 						   "		<tr>\n" +
 						   "			<td>2.선택</td>\n" +
-						   "			<td>" + selected_val + "<input type=\"hidden\" name=\"" + id_value + "_input2\" id=\"" + id_value + "_input2\" value=\"" + selected_val + "\"/></td>\n" +
+						   "			<td id=\"" + id_value + "_td2\">" + selected_val + "</td>\n" +
 						   "		</tr>\n" +
 						   "		<tr>\n" +
 						   "			<td>3.입력</td>\n" +
@@ -102,18 +124,41 @@
 			    		   "				<th>항목삭제</th>\n" +
 			    		   "			</tr>\n" +
 						   "			</thead>\n" +
-						   "			<tbody id=\"my-tbody\">\n" +
+						   "			<tbody id=\"my-tbody-" + id_value + "\">\n" +
 						   "			</tbody>\n" +
 						   "		</table>\n" +
 						   "</div>";
+	}
+	
+	function sub_change_value() {
+		var tbl1_select = document.getElementById("input2");
+		var selected_val = tbl1_select.options[tbl1_select.selectedIndex].value;
+		var body = document.getElementById("my-tbody");
+		console.log("body.childNodes.length : " + body.childNodes.length);
+		console.log("selected_val : " + selected_val);
+		for (var i = 1; i < body.childNodes.length; i++) {
+			var td_val = body.rows[i - 1].cells[0].innerHTML;
+			console.log("td_val : " + td_val);
+			console.log("value : " + document.getElementById("sub" + td_val).value);
+			var val = document.getElementById("sub" + td_val).value;
+			if (val != "") {
+				var id_val = document.getElementById("sub" + td_val).value;
+				console.log("id_val : " + id_val);
+				var target_hidden = document.getElementById(id_val + "_input2");
+				target_hidden.setAttribute("value", selected_val);
+				var target_td = document.getElementById(id_val + "_td2");
+				target_td.innerHTML = selected_val;
+			}
+		}
+		// alert("sub_input2_value_change!!");
 	}
 </script>
 </head>
 <body>
 <div id="cloneSource">
 <br/>
-<button onclick="add_row()">행 추가하기</button>
-<p/>
+<button onclick="add_row('my-tbody')">행 추가하기</button>
+<p></p>
 <table>
 	<tr>
 		<td>1.입력</td>
@@ -122,7 +167,7 @@
 	<tr>
 		<td>2.선택</td>
 		<td>
-			<select name="input2" id="input2">
+			<select name="input2" id="input2" onchange="sub_change_value()">
 				<option value="NM1">NM1</option>
 				<option value="NM2">NM2</option>
 			</select>
