@@ -50,11 +50,16 @@
 		var id_value = document.getElementById(id).getAttribute("id");
 		var element = document.getElementById(id_value);
 		var value = element.value;
-		// console.log("value : " + value);
+		console.log("id_value : " + id_value);
 		if (value != null && value.length > 0) {
 			element.onkeyup = function() {
-				// var tagName = this.element.getElementsByTagName("h3");
-				// console.log("tagName : " + tagName);
+				this.setAttribute("onchange", "");
+				var targetElement = document.getElementById("title_" + id_value);
+				var targetElement1 = document.getElementById(id_value + "_td1");
+				var targetElement2 = document.getElementById(id_value + "_input1");
+				targetElement.innerHTML = "전문 Layout (" + this.value + ")";
+				targetElement1.innerHTML = this.value;
+				targetElement2.value = this.value;
 				console.log("value : " + this.value);
 			}
 		}
@@ -120,7 +125,7 @@
 						   "	<input type=\"hidden\" name=\"" + value_id + "_input1\" id=\"" + value_id + "_input1\" value=\"" + id_value + "\"/>\n" +
 						   "	<input type=\"hidden\" name=\"" + value_id + "_input2\" id=\"" + value_id + "_input2\" value=\"" + selected_val + "\"/>\n" +
 						   "	<br/>\n" +
-						   "	<h3>전문 Layout (" + id_value + ")</h3>" +
+						   "	<h3><span id=\"title_" + value_id + "\">전문 Layout (" + id_value + ")</span></h3>" +
 						   "	<input type=\"button\" value=\"행추가하기\" onclick=\"add_row('" + value_id + "')\"/>\n" +
 						   "	<p/>\n" +
 						   "	<table>\n" +
