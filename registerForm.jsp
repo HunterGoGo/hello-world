@@ -50,17 +50,26 @@
 		var id_value = document.getElementById(id).getAttribute("id");
 		var element = document.getElementById(id_value);
 		var value = element.value;
-		console.log("id_value : " + id_value);
+		element.setAttribute("onchange","check_value(this)");
+		console.log("first : " + element.getAttribute("onchange"));
 		if (value != null && value.length > 0) {
 			element.onkeyup = function() {
-				this.setAttribute("onchange", "");
+				element.setAttribute("onchange","check_value(this)");
+				console.log("second : " + element.getAttribute("onchange"));
 				var targetElement = document.getElementById("title_" + id_value);
 				var targetElement1 = document.getElementById(id_value + "_td1");
 				var targetElement2 = document.getElementById(id_value + "_input1");
-				targetElement.innerHTML = "전문 Layout (" + this.value + ")";
-				targetElement1.innerHTML = this.value;
-				targetElement2.value = this.value;
-				console.log("value : " + this.value);
+
+				if (targetElement != null) {
+					this.setAttribute("onchange","");
+					targetElement.innerHTML = "전문 Layout (" + this.value + ")";
+					targetElement1.innerHTML = this.value;
+					targetElement2.value = this.value;
+				}
+				if (this.value.length == 0) {
+					this.setAttribute("onchange","check_value(this)");
+					console.log("third : " + element.getAttribute("onchange"));
+				} 
 			}
 		}
 	}
@@ -109,8 +118,10 @@
 			var id = obj.getAttribute("id");
 			var del_id_div = document.getElementById(id).getAttribute("id");
 			del_id_div = "div_" + del_id_div;
+			console.log("del_id_div : " + del_id_div);
 			var del_id = document.getElementById(del_id_div);
-			del_id.innerHTML = "";
+			del_id.parentNode.removeChild(del_id);
+			// del_id.innerHTML = "";
 		}
 	}
 	
