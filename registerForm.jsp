@@ -51,11 +51,10 @@
 		var element = document.getElementById(id_value);
 		var value = element.value;
 		element.setAttribute("onchange","check_value(this)");
-		console.log("first : " + element.getAttribute("onchange"));
+		
 		if (value != null && value.length > 0) {
 			element.onkeyup = function() {
 				element.setAttribute("onchange","check_value(this)");
-				console.log("second : " + element.getAttribute("onchange"));
 				var targetElement = document.getElementById("title_" + id_value);
 				var targetElement1 = document.getElementById(id_value + "_td1");
 				var targetElement2 = document.getElementById(id_value + "_input1");
@@ -68,7 +67,6 @@
 				}
 				if (this.value.length == 0) {
 					this.setAttribute("onchange","check_value(this)");
-					console.log("third : " + element.getAttribute("onchange"));
 				} 
 			}
 		}
@@ -186,6 +184,40 @@
 			}
 		}
 	}
+	
+	function checkFrom() {
+		var sub = document.getElementById("sub").getElementsByTagName("div");
+		var check_num = [];
+		for (var i = 0; i < sub.length; i++) {
+			var div_id_value = sub[i].getAttribute("id");
+			check_num.push(div_id_value.substr(div_id_value.length - 1));
+		}
+		
+		for (var i = 0; i < check_num.length; i++) {
+			var checkInput = "sub_" + check_num[i];
+			var checkInput_id = document.getElementById(checkInput + "_input3");
+			var checkTbody_id = document.getElementById("my-tbody-" + checkInput);
+			var getRow = checkTbody_id.getElementsByTagName("tr");
+			var val = checkTbody_id.rows.length;
+			
+			if (checkInput_id.value == "" || checkInput_id.value.length == 0) {
+				alert("input3는 필수 입력사항입니다.");
+				checkInput_id.focus();
+				return false;
+			}
+			for (var j = 0; j < val; j++) {
+				var str = checkTbody_id.getElementsByTagName("tr")[j].getElementsByTagName("td")[3].getElementsByTagName("input")[0];
+				if (str.value == "" || str.value == 0) {
+					alert("필수 입력사항입니다.");
+					str.focus();
+					return false;
+				}
+				console.log("str : " + str.value);
+			}
+		}
+		
+		// registerForm.submit;
+	}
 </script>
 </head>
 <body>
@@ -193,6 +225,7 @@
 <div id="cloneSource">
 <br/>
 <input name="btn" type="button" value="행 추가하기" onclick="add_row('my-tbody')"/>
+<input name="btn" type="button" value="저장" onclick="checkFrom();"/>
 <p></p>
 <table>
 	<tr>
