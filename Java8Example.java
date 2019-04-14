@@ -43,12 +43,12 @@ public class Java8Example {
 		
 		List<NumberVO> deleteNumbers = getDeleteList(numbers, updateNumbers);
 
-		StringBuilder sb = insertCommanInDeleteList(deleteNumbers);
+		StringBuilder sb = insertCommaInDeleteList(deleteNumbers);
 		
 		System.out.println("deleteNumbers : " + sb.toString());
 	}
 
-	private static StringBuilder insertCommanInDeleteList(List<NumberVO> deleteNumbers) {
+	private static StringBuilder insertCommaInDeleteList(List<NumberVO> deleteNumbers) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < deleteNumbers.size(); i++) {
 			if (deleteNumbers.get(i).getMidName() != null && !deleteNumbers.get(i).getMidName().isEmpty()) {
