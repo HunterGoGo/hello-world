@@ -32,6 +32,9 @@
 	    var cell3 = row.insertCell(2);
 	    var cell4 = row.insertCell(3);
 	    var cell5 = row.insertCell(4);
+	    var cell6 = row.insertCell(5);
+	    var cell7 = row.insertCell(6);
+	    var cell8 = row.insertCell(7);
 	    cell1.innerHTML = str;
 	    cell2.innerHTML = new Date().toUTCString();
 	    if (tbody == "my-tbody") {
@@ -40,9 +43,89 @@
 	    } else {
 	    	cell3.innerHTML = "";
 	    }
-	    cell4.innerHTML = "<input name=\"add_" + str + "\" id=\"add_" + str + "\" type=\"text\"/>";
-	    cell5.innerHTML = "<input name=\"btn_" + str + "\" id=\"btn_" + str +
+	    cell4.innerHTML = "<input name=\"length_" + str + "\" id=\"length_" + str + "\" type=\"text\" onkeyup=\"checkLength(this);\"/>";
+	    cell5.innerHTML = "<input name=\"maxLength_" + str + "\" id=\"maxLength_" + str + "\" type=\"text\" onkeyup=\"checkLength(this);\"/>";
+	    cell6.innerHTML = "<input name=\"minLength_" + str + "\" id=\"minLength_" + str + "\" type=\"text\" onkeyup=\"checkLength(this);\"/>";
+	    cell7.innerHTML = "<input name=\"btn_" + str + "\" id=\"btn_" + str +
 	    		"\" type=\"button\" value=\"삭제\" onclick=\"delete_row(this,'','" + tbody + "')\"/>";
+	    cell8.innerHTML = "<input name=\"popup_btn_" + str + "\" id=\"popup_btn_" + str +
+	    		"\" type=\"button\" value=\"항목추가\" onclick=\"showPopup()\"/>";
+	}
+	
+	function checkLength(obj) {
+		// var onlyDecimal = /[0-9][0-9.]*$/g;
+		var onlyDecimal = /^\d*(\.?\d*)$/g;
+		var onlyInt = /[1-9][0-9]*$/g;
+		var id = obj.getAttribute("id");
+		id = document.getElementById(id);
+		var id_value = id.getAttribute("id");
+
+		if (id_value.indexOf("length_") != -1) {
+			// console.log("id.value.substr : " + id_value.substr("length_".length, id_value.length - 1));
+			if (!onlyDecimal.test(id.value)) {
+				alert("숫자(소수점 포함)만 입력할 수 있습니다.");
+				id.value = "";
+				id.focus();
+				return false;
+			}
+			var maxLengthId = document.getElementById("maxLength_" + id_value.substr("length_".length, id_value.length - 1));
+			var minLengthId = document.getElementById("minLength_" + id_value.substr("length_".length, id_value.length - 1));
+			if (maxLengthId.value != "" || minLengthId.value != "" 
+					|| maxLengthId.value.length > 0 || minLengthId.value.length > 0) {
+				alert("길이값 입력시, 최대·최소길이값은 입력할 수 없습니다.");
+				maxLengthId.value = "";
+				minLengthId.value = "";
+				return false;
+			}
+			// console.log("maxLengthId.value : " + maxLengthId.value);
+		} else if (id_value.indexOf("maxLength_") != -1 || id_value.indexOf("minLength_") != -1) {
+			// console.log("id.value.substr : " + id_value.substr("maxLength_".length, id_value.length - 1));
+			if (!onlyInt.test(id.value)) {
+				alert("숫자(정수)만 입력할 수 있습니다.");
+				id.value = "";
+				id.focus();
+				return false;
+			}
+			var lengthId = document.getElementById("length_" + id_value.substr("maxLength_".length, id_value.length - 1));
+			if (lengthId.value != "" || lengthId.value.length > 0) {
+				alert("최대·최소길이값 입력시, 길이값은 입력할 수 없습니다.");
+				lengthId.value = "";
+				return false;
+			}
+			if (id_value.indexOf("maxLength_") != -1) {
+				var maxLengthId = document.getElementById(id_value);
+				var minLengthId = document.getElementById("minLength_" + id_value.substr("maxLength_".length, id_value.length - 1));
+				// console.log("maxLengthId.value : " + maxLengthId.value);
+				// console.log("minLengthId.value : " + minLengthId.value);
+				if (Number(maxLengthId.value) < Number(minLengthId.value)) {
+					alert("최대길이값은 최소길이값보다 같거나 커야 합니다.");
+					maxLengthId.value = "";
+					minLengthId.value = "";
+					maxLengthId.focus();
+					return false;
+				}
+			} else if (id_value.indexOf("minLength_") != -1) {
+				var maxLengthId = document.getElementById("maxLength_" + id_value.substr("minLength_".length, id_value.length - 1));
+				var minLengthId = document.getElementById(id_value);
+				// console.log("maxLengthId.value : " + maxLengthId.value);
+				// console.log("minLengthId.value : " + minLengthId.value);
+				if (Number(maxLengthId.value) < Number(minLengthId.value)) {
+					alert("최대길이값은 최소길이값보다 같거나 커야 합니다.");
+					maxLengthId.value = "";
+					minLengthId.value = "";
+					maxLengthId.focus();
+					return false;
+				}
+			}
+		}
+		// console.log("id_value : " + id_value);
+	}
+	
+	var openWin;
+	
+	function showPopup() {
+		window.name = "parentForm";
+		openWin = window.open("popup.jsp?check_id=sos","childForm","width=570,height=350,resizable=no,scrollbars=yes");
 	}
 	
 	function check_text(obj) {
@@ -158,8 +241,11 @@
 			    		   "				<th>번호</th>\n" +
 			    		   "				<th>일자</th>\n" +
 			    		   "				<th>서브메시지</th>\n" +
-			    		   "				<th>선택지</th>\n" +
+			    		   "				<th>길이</th>\n" +
+			    		   "				<th>최대길이</th>\n" +
+			    		   "				<th>최소길이</th>\n" +
 			    		   "				<th>항목삭제</th>\n" +
+			    		   "				<th>항목추가</th>\n" +
 			    		   "			</tr>\n" +
 						   "			</thead>\n" +
 						   "			<tbody id=\"my-tbody-" + value_id + "\">\n" +
@@ -185,7 +271,7 @@
 		}
 	}
 	
-	function checkFrom() {
+	function checkForm() {
 		var sub = document.getElementById("sub").getElementsByTagName("div");
 		var check_num = [];
 		for (var i = 0; i < sub.length; i++) {
@@ -225,7 +311,7 @@
 <div id="cloneSource">
 <br/>
 <input name="btn" type="button" value="행 추가하기" onclick="add_row('my-tbody')"/>
-<input name="btn" type="button" value="저장" onclick="checkFrom();"/>
+<input name="btn" type="button" value="저장" onclick="checkForm();"/>
 <p></p>
 <table>
 	<tr>
@@ -253,8 +339,11 @@
 	    	<th>번호</th>
 	    	<th>일자</th>
 	    	<th>서브메시지</th>
-	    	<th>선택지</th>
+	    	<th>길이</th>
+	    	<th>최대길이</th>
+	    	<th>최소길이</th>
 	    	<th>항목삭제</th>
+	    	<th>항목추가</th>
 	    </tr>
 	</thead>
 	<tbody id="my-tbody">
