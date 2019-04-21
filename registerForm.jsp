@@ -43,26 +43,34 @@
 	    } else {
 	    	cell3.innerHTML = "";
 	    }
-	    cell4.innerHTML = "<input name=\"length_" + str + "\" id=\"length_" + str + "\" type=\"text\" onkeyup=\"checkLength(this);\"/>";
-	    cell5.innerHTML = "<input name=\"maxLength_" + str + "\" id=\"maxLength_" + str + "\" type=\"text\" onkeyup=\"checkLength(this);\"/>";
-	    cell6.innerHTML = "<input name=\"minLength_" + str + "\" id=\"minLength_" + str + "\" type=\"text\" onkeyup=\"checkLength(this);\"/>";
+	    cell4.innerHTML = "<input name=\"length_" + str + "\" id=\"length_" + str + "\" type=\"text\" onkeyup=\"checkLengthValue(this);\"/>";
+	    cell5.innerHTML = "<input name=\"maxLength_" + str + "\" id=\"maxLength_" + str + "\" type=\"text\" onkeyup=\"checkLengthValue(this);\"/>";
+	    cell6.innerHTML = "<input name=\"minLength_" + str + "\" id=\"minLength_" + str + "\" type=\"text\" onkeyup=\"checkLengthValue(this);\"/>";
 	    cell7.innerHTML = "<input name=\"btn_" + str + "\" id=\"btn_" + str +
 	    		"\" type=\"button\" value=\"삭제\" onclick=\"delete_row(this,'','" + tbody + "')\"/>";
 	    cell8.innerHTML = "<input name=\"popup_btn_" + str + "\" id=\"popup_btn_" + str +
 	    		"\" type=\"button\" value=\"항목추가\" onclick=\"showPopup()\"/>";
 	}
 	
-	function checkLength(obj) {
-		// var onlyDecimal = /[0-9][0-9.]*$/g;
-		var onlyDecimal = /^\d*(\.?\d*)$/g;
-		var onlyInt = /[1-9][0-9]*$/g;
+	function checkLengthValue(obj) {
+		var onlyDecimal = /[0-9][0-9.]*$/g;
+		// var onlyDecimal = /^\d*(\.?\d*)$/g;
+		var onlyInt = /[0-9][0-9]*$/g;
+		var isDecimalForm = /^0[0-9].?/;
+		var isIntForm = /^0[0-9]?/;
 		var id = obj.getAttribute("id");
 		id = document.getElementById(id);
 		var id_value = id.getAttribute("id");
 
 		if (id_value.indexOf("length_") != -1) {
 			// console.log("id.value.substr : " + id_value.substr("length_".length, id_value.length - 1));
-			if (!onlyDecimal.test(id.value)) {
+			if (isDecimalForm.test(id.value) && id.value.length > 0) {
+				alert("올바른 형식의 입력이 아닙니다.");
+				id.value = "";
+				id.focus();
+				return false;
+			}
+			if (!onlyDecimal.test(id.value) && id.value.length > 0) {
 				alert("숫자(소수점 포함)만 입력할 수 있습니다.");
 				id.value = "";
 				id.focus();
@@ -80,7 +88,13 @@
 			// console.log("maxLengthId.value : " + maxLengthId.value);
 		} else if (id_value.indexOf("maxLength_") != -1 || id_value.indexOf("minLength_") != -1) {
 			// console.log("id.value.substr : " + id_value.substr("maxLength_".length, id_value.length - 1));
-			if (!onlyInt.test(id.value)) {
+			if (isIntForm.test(id.value) && id.value.length > 0) {
+				alert("올바른 형식의 입력이 아닙니다.");
+				id.value = "";
+				id.focus();
+				return false;
+			}
+			if (!onlyInt.test(id.value) && id.value.length > 0) {
 				alert("숫자(정수)만 입력할 수 있습니다.");
 				id.value = "";
 				id.focus();
