@@ -11,6 +11,10 @@
 	int totalRecord = 0; // 전체 레코드 수
 	int numPerPage = 15; // 페이지 당 레코드 수
 	int pagePerBlock = 10; // 블럭 당 페이지 수
+	
+	if (request.getParameter("numPerPage") != null && !request.getParameter("numPerPage").isEmpty()) {
+		numPerPage = Integer.parseInt(request.getParameter("numPerPage"));		
+	}
 
 	int totalPage = 0; // 전체 페이지 수
 	int totalBlock = 0; // 전체 블록 수
@@ -25,11 +29,17 @@
 	
 	Round10_MemberDTO dto = new Round10_MemberDTO();
 	Round10_MemberDAO dao = new Round10_MemberDAO();
+	if (searchCondition == null || searchCondition.isEmpty()) {
+		searchCondition = "all";
+		searchKeyword = "";
+	}
 	if (searchKeyword != null && !searchKeyword.isEmpty()) {
 		if (searchCondition.equals("name")) {
 			dto.setName(searchKeyword);
 		} else if (searchCondition.equals("address")) {
 			dto.setAddress(searchKeyword);
+		} else if (searchCondition.equals("all")) {
+			searchKeyword = "";
 		}
 	}
 	
@@ -75,7 +85,7 @@
 <p></p>
 <hr/>
 <form method="post" name="listForm" id="listForm" action="list.jsp">
-	<input type="hidden" name="nowPage" id="nowPage" value="<%=nowPage%>">
+	<input type="hidden" name="nowPage" id="nowPage" value="<%=nowPage%>"/>
 	<div>
 		<select name="searchCondition">
 			<option value="all" <%=searchCondition.equals("all") ? "selected" : "" %>>전체</option>
@@ -87,6 +97,12 @@
 		<span style="text-align: right;">
 			Total : <%=totalRecord %> Articles(<font color="red"><%=nowPage %>/<%=totalPage %>Pages</font>)
 		</span>
+		표시글수 : 
+		<select name="numPerPage" onchange="this.form.submit();">
+			<option value="15" <%=numPerPage == 15 ? "selected" : "" %>>15개</option>
+			<option value="30" <%=numPerPage == 30 ? "selected" : "" %>>30개</option>
+			<option value="50" <%=numPerPage == 50 ? "selected" : "" %>>50개</option>
+		</select>
 	</div>
 </form>
 <hr/>
@@ -125,7 +141,7 @@
 		// int pageEnd = ((pageStart + pagePerBlock) < totalPage) ? pagePerBlock : totalPage;  // 하단 페이지 끝 번호
 		if (totalPage != 0) {
 			if (nowBlock > 1) { %>
-			<a href="javascript:block('<%=nowBlock - 1 %>');">prev...</a>		
+			<&nbsp;<a href="javascript:block('<%=nowBlock - 1 %>');">이전</a>		
 	<%		} %>&nbsp;
 	<%		for ( ; pageStart < pageEnd; pageStart++) { %>
 			<a href="javascript:paging(<%=pageStart %>);">
@@ -135,7 +151,7 @@
 			</a>
 	<%		} // for %>&nbsp;
 	<%		if (totalBlock > nowBlock) { %>
-			<a href="javascript:block('<%=nowBlock + 1 %>');">...next</a>
+			<a href="javascript:block('<%=nowBlock + 1 %>');">다음</a>&nbsp;>
 	<%		} %>&nbsp;
 	<%	} %>
 		<!-- 페이징 및 블럭 처리 End -->
